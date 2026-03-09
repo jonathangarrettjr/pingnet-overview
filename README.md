@@ -16,6 +16,51 @@ PingNet is designed for environments where traditional communication systems deg
 
 The goal is to create a **resilient safety communication layer** that complements existing mobility systems.
 
+# System Overview
+
+PingNet nodes form a local mesh network that allows vehicles, drones, and infrastructure to exchange safety-critical data in real time.
+
+## High-Level Architecture
+           +-------------------+
+           |   Roadside Unit   |
+           |    (RSU Node)     |
+           +---------+---------+
+                     |
+                     |
+        +------------+-------------+
+        |                          |
++-------+-------+          +-------+-------+
+|  Vehicle Node |          |  Vehicle Node |
+|     (Car)     |          |     (Car)     |
++-------+-------+          +-------+-------+
+        |                          |
+        |                          |
+        |        Local Mesh        |
+        |     (Wi-Fi / BLE)        |
+        |                          |
++-------+-------+          +-------+-------+
+|  EMS / Public  |         | Construction  |
+|  Safety Node   |         |    Node       |
++-------+-------+          +-------+-------+
+        |
+        |
++-------+-------+
+|   Drone / UAS |
+|      Node     |
++---------------+
+
+Nodes communicate directly over short-range transports such as Wi-Fi or Bluetooth.
+
+Each node can:
+
+- broadcast hazards
+- relay safety messages
+- verify cryptographic signatures
+- participate in distributed trust decisions
+- propagate crisis alerts
+
+The mesh operates without requiring cellular networks or centralized infrastructure.
+
 ---
 
 # Core Idea
@@ -221,6 +266,53 @@ The platform must function reliably even when infrastructure is unavailable and 
 - resilient infrastructure design  
 
 PingNet is currently exploring collaborations with engineers interested in **hard distributed systems problems in real-world environments**.
+
+---
+
+# MVP Demonstration
+
+PingNet currently includes a working proof-of-concept mesh network deployed on Raspberry Pi hardware.
+
+The MVP demonstrates:
+
+- multi-node hazard propagation
+- signed safety message exchange
+- distributed relay behavior
+- role-based priority messaging
+
+### Hardware Testbed
+
+The prototype test environment uses a six-node Raspberry Pi mesh including:
+
+- Vehicle nodes
+- Emergency services node
+- Construction zone node
+- UAS / drone relay node
+- Console / map visualization node
+
+These nodes communicate over a local wireless mesh and relay safety alerts between participants.
+
+---
+
+# Customer Discovery
+
+PingNet development has been informed by interviews with transportation leaders and industry participants.
+
+Stakeholders consulted include:
+
+- Utah Department of Transportation
+- Delaware Department of Transportation
+- Maricopa County DOT
+- Eastern Transportation Coalition
+
+Research findings highlight several key challenges for V2X deployment:
+
+- low vehicle equipage
+- funding constraints
+- standards uncertainty
+- the need for trustworthy safety alerts
+
+These insights guide PingNet’s focus on infrastructure-independent safety communication.
 
 ---
 
