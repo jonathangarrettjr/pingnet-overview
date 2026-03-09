@@ -21,33 +21,34 @@ The goal is to create a **resilient safety communication layer** that complement
 PingNet nodes form a local mesh network that allows vehicles, drones, and infrastructure to exchange safety-critical data in real time.
 
 ## High-Level Architecture
-           +-------------------+
-           |   Roadside Unit   |
-           |    (RSU Node)     |
-           +---------+---------+
-                     |
-                     |
-        +------------+-------------+
-        |                          |
-+-------+-------+          +-------+-------+
-|  Vehicle Node |          |  Vehicle Node |
-|     (Car)     |          |     (Car)     |
-+-------+-------+          +-------+-------+
-        |                          |
-        |                          |
-        |        Local Mesh        |
-        |     (Wi-Fi / BLE)        |
-        |                          |
-+-------+-------+          +-------+-------+
-|  EMS / Public  |         | Construction  |
-|  Safety Node   |         |    Node       |
-+-------+-------+          +-------+-------+
-        |
-        |
-+-------+-------+
-|   Drone / UAS |
-|      Node     |
-+---------------+
+            +-------------------+
+            |   Roadside Unit   |
+            |    (RSU Node)     |
+            +---------+---------+
+                      |
+                      |
+         +------------+-------------+
+         |                          |
+ +-------+-------+          +-------+-------+
+ |  Vehicle Node |          |  Vehicle Node |
+ |     (Car)     |          |     (Car)     |
+ +-------+-------+          +-------+-------+
+         |                          |
+         |                          |
+         |        Local Mesh        |
+         |     (Wi-Fi / BLE)        |
+         |                          |
+ +-------+-------+          +-------+-------+
+ |  EMS / Public  |         | Construction  |
+ |  Safety Node   |         |    Node       |
+ +-------+-------+          +-------+-------+
+         |
+         |
+ +-------+-------+
+ |   Drone / UAS |
+ |      Node     |
+ +---------------+
+
 
 Nodes communicate directly over short-range transports such as Wi-Fi or Bluetooth.
 
