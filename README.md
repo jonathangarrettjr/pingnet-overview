@@ -21,6 +21,7 @@ The goal is to create a **resilient safety communication layer** that complement
 PingNet nodes form a local mesh network that allows vehicles, drones, and infrastructure to exchange safety-critical data in real time.
 
 ## High-Level Architecture
+```text
             +-------------------+
             |  Roadside Unit    |
             |    (RSU Node)     |
@@ -49,6 +50,7 @@ PingNet nodes form a local mesh network that allows vehicles, drones, and infras
   | Drone /    |
   |   UAS Node |
   +------------+
+```
 
 Nodes communicate directly over short-range transports such as Wi-Fi or Bluetooth.
 
