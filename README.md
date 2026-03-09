@@ -287,13 +287,17 @@ The MVP demonstrates:
 
 The prototype test environment uses a six-node Raspberry Pi mesh including:
 
-- Vehicle nodes
+- 2x Vehicle nodes
 - Emergency services node
 - Construction zone node
 - UAS / drone relay node
 - Console / map visualization node
 
 These nodes communicate over a local wireless mesh and relay safety alerts between participants.
+
+<img width="1509" height="1013" alt="image" src="https://github.com/user-attachments/assets/ddf809a9-a6a0-4694-9fbe-bcd4562e4604" />
+
+*Six-node PingNet MVP testbed demonstrating vehicle, EMS, construction, and UAS nodes participating in a local safety mesh network. Console node not pictured.*
 
 ---
 
