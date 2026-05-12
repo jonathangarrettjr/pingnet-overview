@@ -1,340 +1,440 @@
-# pingnet-overview
+# PingNet
 
-**Decentralized Safety Communication Mesh for Vehicles, Drones, and Infrastructure**
+## Connected Safety for Work Zones
 
-PingNet is a local-first mesh networking platform designed to improve situational awareness and coordination between vehicles, unmanned aerial systems (UAS), infrastructure nodes, and human drivers.
+PingNet is a local-first, infrastructure-light connected safety system designed to improve hazard awareness in roadway work zones and constrained corridor environments.
 
-The system enables safety-critical data to propagate locally across nearby participants **without requiring cellular networks, GPS connectivity, or centralized infrastructure**.
+The current focus is a pilot-ready work-zone safety layer that relays authenticated hazard messages between cabinet nodes, vehicle nodes, work-zone nodes, and observer nodes without relying on continuous cellular coverage or continuous backhaul connectivity.
 
-PingNet is designed for environments where traditional communication systems degrade or fail:
+PingNet is **not** currently being positioned as a broad V2X replacement, a citywide traffic platform, or a consumer mobile launch. The near-term goal is to generate defensible safety evidence through controlled pilot deployments.
 
-- tunnels
-- dense urban areas
-- disaster zones
-- remote infrastructure
-- GPS-denied environments
+---
 
-The goal is to create a **resilient safety communication layer** that complements existing mobility systems.
+## Current Status
 
-# System Overview
+PingNet has completed a validated six-node pilot baseline using Raspberry Pi hardware and mixed node roles.
 
-PingNet nodes form a local mesh network that allows vehicles, drones, and infrastructure to exchange safety-critical data in real time.
+The system has demonstrated:
 
-## High-Level Architecture
-```text
-            +-------------------+
-            |  Roadside Unit    |
-            |    (RSU Node)     |
-            +---------+---------+
-                      |
-                      |
-        +-------------+-------------+
-        |                           |
-  +-----+------+              +-----+------+
-  | Vehicle    |              | Vehicle    |
-  |  Node      |              |  Node      |
-  |  (Car)     |              |  (Car)     |
-  +-----+------+              +-----+------+
-        |                           |
-        |        Local Mesh         |
-        |     (Wi-Fi / BLE)         |
-        |                           |
-  +-----+------+              +-----+------+
-  | EMS /      |              | Construction|
-  | Safety     |              |    Node     |
-  |   Node     |              |             |
-  +-----+------+              +-----+------+
-        |
-        |
-  +-----+------+
-  | Drone /    |
-  |   UAS Node |
-  +------------+
+- 3 consecutive validated work-zone dry runs
+- 6/6 nodes observed in every run
+- 100% delivery reliability
+- 0 missing downstream receipts
+- 100% signature validation success
+- 0 invalid signatures accepted
+- p95 latency range of 36–299 ms
+- replay and duplicate suppression
+- full log collection and KPI generation
+- sponsor-ready evidence output
+
+Current status: **pilot-ready baseline achieved**.
+
+The next technical step is expansion to **10–12 nodes**, followed by reliability characterization toward a **20–30 node corridor pilot**.
+
+---
+
+## Pilot Use Case
+
+The current pilot use case is **work-zone hazard propagation**.
+
+A work-zone node, vehicle node, or cabinet sidecar node generates a signed hazard message. Nearby nodes validate the message, reject replays or duplicates, and relay the message across the local corridor mesh. Observer nodes collect evidence for post-run KPI analysis.
+
+The pilot measures:
+
+- delivery reliability
+- latency
+- delivery rate
+- replay rejection
+- signature validation
+- node uptime
+- time-to-awareness improvement
+
+The goal is to answer one practical question:
+
+> Can a local-first hazard propagation system improve awareness of work-zone hazards in a measurable, repeatable way?
+
+---
+
+## Pilot Architecture
+
+```mermaid
+flowchart LR
+    WZ[Work-zone / Lane Closure Node] --> V1[Vehicle Node]
+    V1 --> C1[Cabinet Sidecar Node]
+    C1 --> C2[Cabinet Sidecar Node]
+    C2 --> V2[Vehicle Node]
+    C2 --> OBS[Observer / Analysis Node]
+
+    WZ -. signed hazard .-> C1
+    C1 -. validated relay .-> C2
+    C2 -. alert propagation .-> V2
+    OBS -. post-run logs .-> REPORT[KPI Evidence Report]
+
+    classDef node fill:#e8f1ff,stroke:#1f4e8c,stroke-width:1px;
+    classDef hazard fill:#fff2cc,stroke:#c28a00,stroke-width:1px;
+    classDef report fill:#e6f4ea,stroke:#2e7d32,stroke-width:1px;
+
+    class V1,V2,C1,C2,OBS node;
+    class WZ hazard;
+    class REPORT report;
 ```
 
-Nodes communicate directly over short-range transports such as Wi-Fi or Bluetooth.
+Simple view:
 
-Each node can:
-
-- broadcast hazards
-- relay safety messages
-- verify cryptographic signatures
-- participate in distributed trust decisions
-- propagate crisis alerts
-
-The mesh operates without requiring cellular networks or centralized infrastructure.
-
----
-
-# Core Idea
-
-Modern mobility systems depend heavily on centralized infrastructure:
-
-- cellular networks  
-- GPS  
-- cloud routing  
-
-These systems work well in normal conditions but degrade in environments where connectivity is unreliable.
-
-PingNet introduces a **local safety communication layer** where nearby participants share critical information directly using short-range transports such as:
-
-- Wi-Fi  
-- Bluetooth Low Energy  
-- optional C-V2X integration  
-- optional cellular bridge  
-
-Nodes form a **temporary distributed mesh**, propagating safety information across the local environment.
+```text
+[Work-zone node]
+        |
+        v
+[Vehicle node] <-> [Cabinet sidecar] <-> [Cabinet sidecar] <-> [Vehicle node]
+                                      |
+                                      v
+                          [Observer / analysis node]
+                                      |
+                                      v
+                           [KPI evidence report]
+```
 
 ---
 
-# What PingNet Enables
+## Node Roles
 
-PingNet supports multiple safety and coordination capabilities.
+### Cabinet Sidecar Node
 
-## Hazard Propagation
+A cabinet sidecar node is a small edge device placed inside or near an existing traffic signal controller cabinet.
 
-Nodes detect hazards and broadcast alerts to nearby participants.
+It is intended to be:
 
-Examples:
+- cleanly installed
+- reversible
+- non-intrusive
+- independent of traffic signal control
+- used for local hazard relay and evidence collection
 
-- debris on roadway  
-- sudden braking events  
-- fog or environmental hazards  
-- stalled vehicles  
+A cabinet sidecar node does **not** modify controller software, timing plans, or safety-critical cabinet functions.
 
-Messages propagate across the mesh to increase awareness beyond line-of-sight.
+### Vehicle Node
 
----
+A vehicle node is a portable unit placed in a participating agency vehicle.
 
-## Predictive Collision Awareness
+Vehicle nodes can:
 
-Vehicles exchange motion vectors such as:
+- receive work-zone or roadway hazard alerts
+- relay validated messages when policy allows
+- log events for KPI analysis
 
-- position  
-- velocity  
-- direction  
+Phase 1 vehicle candidates include:
 
-Nodes can identify potential collision paths before impact and alert nearby participants.
+- public works vehicles
+- traffic operations vehicles
+- police vehicles
+- utility or inspection vehicles
+- other municipal fleet vehicles on a selected corridor
 
----
+Vehicle nodes do **not** require CAN bus integration for the first pilot phase.
 
-## Emergency Priority Signaling
+### Work-Zone Node
 
-Emergency vehicles or responders broadcast **priority messages** that propagate with elevated priority across the mesh.
+A work-zone node represents the active or simulated hazard source.
 
-Nearby participants can react automatically.
+It may be placed near:
 
----
+- lane closures
+- temporary traffic control areas
+- work-zone vehicles
+- staged hazard scenarios
 
-## Infrastructure-Free Coordination
+Its role is to generate signed hazard messages that can propagate through the local corridor mesh.
 
-PingNet continues operating even when:
+### Observer / Analysis Node
 
-- cellular networks fail  
-- GPS is degraded  
-- centralized services are unavailable  
+Observer nodes collect validation data and support post-run analysis.
 
-Nodes rely on local communication and distributed trust verification.
+They help produce the final KPI evidence package by recording:
 
----
-
-# Technical Architecture
-
-PingNet nodes participate in several core processes.
-
-## Peer Discovery
-
-Nodes discover nearby participants using available wireless transports.
-
----
-
-## Message Propagation
-
-Messages are propagated across the mesh using controlled relay mechanisms.
-
-Key considerations include:
-
-- duplicate suppression  
-- message TTL limits  
-- rate limiting  
-- congestion control  
-- priority routing  
+- message receipt
+- latency
+- delivery path behavior
+- replay and duplicate handling
+- node uptime
+- scenario-level observations
 
 ---
 
-## Distributed Trust
+## How the System Works
 
-Each message is cryptographically signed.
+PingNet uses a constrained, local-first message path:
 
-Nodes evaluate trust through:
+```text
+Hazard Source
+    ↓
+Node Runtime
+    ↓
+Message Validation
+    ↓
+Policy / Relay Decision
+    ↓
+Local Transport
+    ↓
+Nearby Nodes
+    ↓
+Observer Logs + KPI Report
+```
 
-- signature verification  
-- short-lived pseudonym credentials  
-- behavioral trust scoring  
-- local voting to isolate malicious nodes  
+Core behaviors:
 
-This approach avoids reliance on centralized revocation lists while maintaining message authenticity.
+- signed hazard messages
+- strict replay protection
+- duplicate suppression
+- bounded relay behavior
+- local-first communication
+- backhaul used only for logging and analysis
+- evidence generation after each run
 
----
-
-## Crisis Mode
-
-Nodes can enter a **crisis state** when a severe incident occurs.
-
-Examples include:
-
-- vehicle collision  
-- catastrophic system fault  
-- manual emergency trigger  
-
-Crisis alerts propagate with the highest priority and require acknowledgment from emergency nodes.
-
-Propagation is controlled to prevent congestion or abuse.
-
----
-
-# Current Development Focus
-
-PingNet development is currently focused on the following areas.
-
-## Mesh Runtime
-
-Rust-based runtime responsible for:
-
-- message propagation  
-- relay logic  
-- duplicate detection  
-- priority scheduling  
-- trust validation  
-
-Key technologies:
-
-- Rust  
-- Tokio async runtime  
-- UDP multicast  
-- cryptographic message signing  
+The safety path is designed to continue operating locally even if backhaul is unavailable.
 
 ---
 
-## Transport Abstraction
+## Validated Baseline
 
-PingNet aims to support multiple transports through a unified abstraction layer.
+PingNet has completed a validated six-node pilot baseline.
 
-Primary transports:
+### Test Setup
 
-- Wi-Fi  
-- Bluetooth Low Energy  
+The baseline used six Raspberry Pi nodes representing a mixed-role environment:
 
-Optional transports:
+- cabinet node
+- vehicle nodes
+- work-zone node
+- observer node
+- responder / supporting roles
 
-- C-V2X  
-- cellular bridge  
+### Validated Runs
 
----
+Three consecutive tagged pilot dry runs were completed:
 
-## Swarm Simulation
+- `run-20260426-002`
+- `run-20260426-003`
+- `run-20260426-004`
 
-Large-scale simulations test behavior under conditions such as:
+### Results
 
-- large node counts  
-- network partitions  
-- malformed messages  
-- replay attacks  
-- node failure  
+| Metric | Result |
+|---|---:|
+| Nodes observed | 6/6 |
+| Delivery reliability | 100.00% |
+| Missing downstream receipts | 0 |
+| Signature validation success | 100.00% |
+| Invalid signatures accepted | 0 |
+| p95 latency | 36–299 ms |
+| Validation status | PASS |
 
----
+### What This Proves
 
-# Why This Is an Interesting Engineering Problem
+The current baseline demonstrates:
 
-PingNet combines several challenging systems problems:
+- multi-node deployment and orchestration
+- deterministic scenario execution with run/scenario tagging
+- decentralized message propagation
+- cryptographic trust enforcement
+- replay and duplicate suppression
+- full log collection and KPI generation
+- sponsor-ready evidence output
 
-- distributed systems  
-- mesh networking  
-- wireless coexistence  
-- failure-mode engineering  
-- safety-critical messaging  
-- adversarial resilience  
+### Known Limitation
 
-The platform must function reliably even when infrastructure is unavailable and network conditions are unpredictable.
+Hop-depth evidence is currently log-derived and not yet independently validated through physical topology correlation.
 
----
-
-# Looking to Connect With Engineers Interested In
-
-- Rust async systems  
-- distributed networking  
-- congestion control  
-- peer-to-peer protocols  
-- safety-critical communication  
-- resilient infrastructure design  
-
-PingNet is currently exploring collaborations with engineers interested in **hard distributed systems problems in real-world environments**.
+This is acceptable for the current baseline but should be improved during 10–12 node expansion.
 
 ---
 
-# MVP Demonstration
+## KPI Evidence Model
 
-PingNet currently includes a working proof-of-concept mesh network deployed on Raspberry Pi hardware.
+PingNet is now being developed as an evidence-generating pilot system.
 
-The MVP demonstrates:
+The primary KPI is:
 
-- multi-node hazard propagation
-- signed safety message exchange
-- distributed relay behavior
-- role-based priority messaging
+> **Reliability**
 
-### Hardware Testbed
+Supporting KPIs include:
 
-The prototype test environment uses a six-node Raspberry Pi mesh including:
+- latency
+- delivery rate
+- replay rejection
+- signature validation
+- node uptime
+- time-to-awareness improvement
 
-- 2x Vehicle nodes
-- Emergency services node
-- Construction zone node
-- UAS / drone relay node
-- Console / map visualization node
+### Evidence Flow
 
-These nodes communicate over a local wireless mesh and relay safety alerts between participants.
+```text
+Pilot Scenario
+    ↓
+Node Logs
+    ↓
+Collection Manifest
+    ↓
+KPI Aggregation
+    ↓
+Sponsor-Facing Report
+```
 
-<img width="1537" height="977" alt="image" src="https://github.com/user-attachments/assets/5a21916b-3eba-4e24-8c22-9b76100b65c1" />
-
-
-*Six-node PingNet MVP testbed demonstrating vehicle, EMS, construction, and UAS nodes participating in a local safety mesh network. Console node not pictured.*
-
----
-
-# Customer Discovery
-
-PingNet development has been informed by interviews with transportation leaders and industry participants.
-
-Stakeholders consulted include:
-
-- Utah Department of Transportation
-- Delaware Department of Transportation
-- Maricopa County DOT
-- Eastern Transportation Coalition
-
-Research findings highlight several key challenges for V2X deployment:
-
-- low vehicle equipage
-- funding constraints
-- standards uncertainty
-- the need for trustworthy safety alerts
-
-These insights guide PingNet’s focus on infrastructure-independent safety communication.
+The system already supports structured run IDs, scenario tags, node roles, and post-run KPI summaries.
 
 ---
 
-# Contact
+## Current Development Focus
 
-**Jonathan Garrett Jr.**  
-Founder — PingNet
+PingNet is currently focused on pilot validation, not broad feature expansion.
+
+Near-term priorities:
+
+1. Expand from 6 nodes to 10–12 nodes
+2. Validate repeatable work-zone scenarios
+3. Improve independent hop-depth evidence
+4. Harden KPI logging and report generation
+5. Prepare for 20–30 node corridor pilot discussions
+6. Maintain Python runtime through pilot completion
+
+Rust remains a future production-hardening path, but it is not required before pilot evidence is generated.
+
+---
+
+## Technical Direction
+
+The current pilot runtime is Python-based and has been validated for the pilot baseline.
+
+The production direction remains:
+
+- compact runtime
+- local-first safety propagation
+- strict message validation
+- bounded relay behavior
+- transport abstraction
+- eventual Rust hardening for performance-critical paths
+
+The current engineering principle is:
+
+> Pilot evidence first. Runtime hardening second.
+
+---
+
+## What This Repository Is
+
+This repository is a public technical overview of PingNet’s pilot direction, system boundaries, and validation progress.
+
+It is intended for:
+
+- engineers evaluating the technical problem
+- pilot partners reviewing deployment assumptions
+- advisors reviewing the architecture
+- grant or funding stakeholders seeking technical context
+
+---
+
+## What This Repository Is Not
+
+This repository is not the full production codebase.
+
+It does not include:
+
+- private implementation details
+- security-sensitive keys
+- deployment credentials
+- proprietary pilot materials
+- full source code for the active runtime
+
+---
+
+## Pilot Partner Fit
+
+PingNet is currently seeking conversations with:
+
+- city managers
+- public works departments
+- traffic operations teams
+- state and local transportation agencies
+- work-zone safety stakeholders
+- municipal fleet operators
+- contractors involved in roadway work-zone operations
+
+A strong first pilot partner would have:
+
+- one candidate arterial corridor
+- several signalized intersections
+- a repeatable or simulated work-zone condition
+- a small group of participating agency vehicles
+- willingness to review a sponsor-ready KPI report
+
+---
+
+## Roadmap
+
+### Completed
+
+- Six-node Raspberry Pi baseline
+- Mixed-role node configuration
+- Ed25519 message signing
+- replay protection
+- duplicate suppression
+- UDP-based local message propagation
+- run/scenario tagging
+- log collection
+- KPI report generation
+- three consecutive validated dry runs
+
+### In Progress
+
+- 10–12 node expansion
+- stronger topology and hop-depth validation
+- repeatable evidence runs
+- pilot partner outreach
+- city and DOT pilot discussions
+
+### Next
+
+- 20–30 node corridor pilot
+- cabinet sidecar + vehicle node deployment
+- active or simulated work-zone scenario
+- sponsor-ready after-action report
+- grant and pilot funding applications
+
+---
+
+## Longer-Term Direction
+
+PingNet’s broader architecture may later support additional connected safety use cases such as:
+
+- responder awareness
+- fleet safety
+- infrastructure participation
+- C-V2X integration
+- cellular bridge support
+- constrained drone or UAS participation
+
+These are not the current pilot wedge.
+
+The current execution path remains:
+
+> work-zone hazard propagation → measurable corridor safety evidence → pilot partner validation → scaled deployment.
+
+---
+
+## Contact
+
+Jonathan Garrett Jr.  
+Founder, PingNet LLC  
 
 Email: jonathan.garrettjr@pingnet.net  
 Website: https://www.pingnet.net  
-LinkedIn: https://www.linkedin.com/in/jonathan-garrett-jr
+LinkedIn: https://www.linkedin.com/in/jonathan-garrett-jr  
 
 ---
 
-# Notes
+## Status Summary
 
-PingNet is currently under active development. Some components and designs described here may evolve as the system matures.
+PingNet has transitioned from prototype to pilot-ready baseline.
+
+The current priority is not expanding features.
+
+The current priority is proving repeatable, measurable safety value in a real-world corridor pilot.
