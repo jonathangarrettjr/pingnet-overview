@@ -1,65 +1,60 @@
 # PingNet
 
-## Connected Safety for Work Zones
+## Local-first communications for work-zone feasibility evaluation
 
-PingNet is a local-first, infrastructure-light connected safety system designed to improve hazard awareness in roadway work zones and constrained corridor environments.
+PingNet is developing local-first, authenticated communications for participating work-zone and fleet nodes. The working prototype exchanges messages among equipped PingNet nodes without requiring continuous cellular coverage or a continuous cloud connection for local validation and relay.
 
-The current focus is a work-zone safety layer that relays authenticated hazard messages between cabinet sidecar nodes, vehicle nodes, work-zone nodes, responder nodes, and observer nodes without relying on continuous cellular coverage or continuous backhaul connectivity.
+The current prototype has completed controlled tabletop tests. The next step is to define a narrowly scoped work-zone feasibility evaluation with an operator, supported by independent technical review.
 
-PingNet is not currently being positioned as a broad V2X replacement, a citywide traffic platform, or a consumer mobile launch. The near-term goal is to generate defensible safety evidence through controlled pilot deployments and advisor-guided field validation.
+PingNet is not presented here as a production-ready safety system, a broad V2X replacement, or a universal vehicle and mobile platform. The work starts with a specific need: helping work-zone teams and participating drivers assess whether authenticated local communications can improve the flow of timely hazard information under defined conditions.
+
+> Status reviewed September 28, 2026. The controlled tests described below were performed on April 26 and June 7, 2026.
 
 ---
 
 ## Current Status
 
-PingNet has progressed from a validated six-node pilot baseline to a validated ten-node pre-pilot testbed.
+### Demonstrated
 
-Validated evidence now includes:
+- controlled six-node and ten-node tabletop operation
+- tagged scenarios, structured run IDs, and mixed node roles
+- signed message validation under the configured trust model
+- replay and duplicate suppression mechanisms
+- local message relay among participating PingNet nodes
+- post-run log collection and KPI summaries
+- CWZ/WZDx-aligned WorkZoneFeed-style and DeviceFeed-style GeoJSON export artifacts derived from selected test evidence
 
-- 3 consecutive six-node work-zone dry runs
-- 3 consecutive ten-node work-zone dry runs
-- 10/10 nodes observed in each ten-node run
-- 54/54 downstream receipts delivered across the ten-node evidence set
-- 100.00% delivery reliability
-- 100.00% signature validation success
-- 0 missing downstream receipts
-- 0 invalid signatures accepted
-- p95 latency range of 30-43 ms in the ten-node runs
-- replay and duplicate suppression
-- structured run IDs, scenario tags, and node roles
-- combined KPI evidence output
-- CWZ/WZDx-aligned WorkZoneFeed-style and DeviceFeed-style GeoJSON export artifacts
+### Current preparation
 
-Current status: **validated pre-pilot scale testbed achieved**.
+PingNet is preparing for a possible customer-funded work-zone feasibility evaluation. Current work is focused on:
 
-The next technical step is advisor-guided field-pilot planning, long-duration test discipline, field geometry verification, topology-correlated hop evidence, and runtime hardening toward a 20-30 node corridor pilot.
+- defining one operator problem and the intended recipients of an alert
+- understanding the operator's existing mapping and information workflow
+- defining a bounded scope for independent technical review
+- preparing a feasible evaluation plan, measurement approach, and evidence package
+- discussing evaluation fit with work-zone operators, public-works and fleet teams, transportation agencies, and appropriate contractors
 
----
-
-## Pilot Use Case
-
-The current pilot use case is **work-zone hazard propagation**.
-
-A work-zone node, vehicle node, responder node, or cabinet sidecar node generates a signed hazard message. Nearby nodes validate the message, reject replays or duplicates, and relay the message across the local corridor mesh. Observer nodes collect evidence for post-run KPI analysis.
-
-The pilot measures:
-
-- delivery reliability
-- latency
-- delivery rate
-- replay rejection
-- signature validation
-- node uptime
-- time-to-awareness improvement
-- export readiness for agency review workflows
-
-The goal is to answer one practical question:
-
-> Can a local-first hazard propagation system improve awareness of work-zone hazards in a measurable, repeatable way?
+No paid evaluation, customer contract, authorized field site, completed independent review, or public-road deployment is confirmed in this update. Outreach and preparation should not be read as signed engagements or completed field tests.
 
 ---
 
-## Pilot Architecture
+## Work-Zone Use Case
+
+The current use case is authenticated hazard-message propagation among equipped, participating PingNet nodes in a work-zone or fleet evaluation.
+
+A work-zone, vehicle, responder, or cabinet-sidecar node can generate a signed hazard message. Nearby PingNet nodes validate the signed content under the configured trust model, apply replay and duplicate controls, and relay eligible messages through the local participating network. Observer nodes collect evidence for post-run analysis.
+
+The current technical question is:
+
+> Under agreed operating conditions, can the prototype deliver authenticated messages among participating nodes with measurable receipt delivery, latency, and continuity?
+
+A scoped feasibility evaluation would not claim to measure crash reduction. Human awareness, driver response, and safety outcomes require separate study designs and should not be inferred from node receipt latency.
+
+---
+
+## Conceptual Architecture
+
+The diagram below is a conceptual role and message-flow illustration. It is not a measured hop path or a deployed road layout.
 
 ```mermaid
 flowchart LR
@@ -99,395 +94,314 @@ Simple view:
                            [KPI evidence package]
 ```
 
+Hop evidence remains log-derived from signed-envelope observations and relay logs. These results support fleet propagation and reliability claims but should not be presented as independent physical hop-depth reliability without topology correlation.
+
 ---
 
 ## Node Roles
 
 ### Cabinet Sidecar Node
 
-A cabinet sidecar node is a small edge device placed inside or near an existing traffic signal controller cabinet.
-
-It is intended to be:
-
-- cleanly installed
-- reversible
-- non-intrusive
-- independent of traffic signal control
-- used for local hazard relay and evidence collection
-
-A cabinet sidecar node does **not** modify controller software, timing plans, or safety-critical cabinet functions.
+A cabinet sidecar node is an edge device intended for reversible installation inside or near an existing traffic-signal controller cabinet. It supports local message relay and evidence collection. It does not modify controller software, timing plans, or safety-critical cabinet functions.
 
 ### Vehicle Node
 
-A vehicle node is a portable unit placed in a participating agency vehicle.
+A vehicle node is a portable unit for a participating fleet vehicle. It can receive eligible alerts, relay validated messages when configured to do so, and record events for post-run analysis.
 
-Vehicle nodes can:
-
-- receive work-zone or roadway hazard alerts
-- relay validated messages when policy allows
-- log events for KPI analysis
-
-Phase 1 vehicle candidates include:
-
-- public works vehicles
-- traffic operations vehicles
-- police vehicles
-- utility or inspection vehicles
-- other municipal fleet vehicles on a selected corridor
-
-Vehicle nodes do **not** require CAN bus integration for the first pilot phase.
+Potential participants in an initial evaluation could include public-works, traffic-operations, utility, inspection, or other approved fleet vehicles. CAN bus integration is not assumed for an initial evaluation.
 
 ### Work-Zone Node
 
-A work-zone node represents the active or simulated hazard source.
-
-It may be placed near:
-
-- lane closures
-- temporary traffic control areas
-- work-zone vehicles
-- staged hazard scenarios
-
-Its role is to generate signed hazard messages that can propagate through the local corridor mesh.
+A work-zone node represents an active or simulated hazard source within the agreed evaluation scenario. It generates signed hazard messages for participating PingNet nodes.
 
 ### Responder Node
 
-A responder node represents an emergency, public safety, or service vehicle entering the corridor.
+A responder node represents an approved public-safety, service, or support vehicle within the evaluation. It can receive eligible alerts, relay validated messages when configured to do so, and record receipt and latency evidence.
 
-Responder nodes can:
+### Observer and Analysis Node
 
-- receive validated work-zone hazard alerts
-- relay validated messages when policy allows
-- produce receipt and latency evidence for post-run analysis
-
-### Observer / Analysis Node
-
-Observer nodes collect validation data and support post-run analysis.
-
-They help produce the final KPI evidence package by recording:
-
-- message receipt
-- latency
-- delivery path behavior
-- replay and duplicate handling
-- node uptime
-- scenario-level observations
+Observer nodes record scenario events and support post-run analysis. Their logs can contribute to receipt, latency, continuity, validation, replay, duplicate-handling, and scenario-level evidence.
 
 ---
 
-## How the System Works
-
-PingNet uses a constrained, local-first message path:
+## Local Path and Post-Run Evidence
 
 ```text
 Hazard Source
     -> Node Runtime
-    -> Message Validation
-    -> Policy / Relay Decision
+    -> Signature and Message Validation
+    -> Policy and Relay Decision
     -> Local Transport
-    -> Nearby Nodes
-    -> Observer Logs + KPI Evidence
+    -> Nearby Participating Nodes
+    -> Observer Logs
+    -> Post-Run KPI and Export Artifacts
 ```
 
-Core behaviors:
+The working prototype uses a local-first communications path for message validation and relay among participating nodes. Safety-message acceptance does not require a cloud connection. Backhaul may be used later to collect logs, analyze evidence, and move post-run reports or export artifacts.
 
-- signed hazard messages
-- strict replay protection
-- duplicate suppression
-- bounded relay behavior
-- local-first communication
-- backhaul used for logging, validation, KPI reporting, and export
-- evidence generation after each run
-
-The real-time safety path is designed to continue operating locally even if backhaul is unavailable.
+Signature checking authenticates signed content under the configured trust model. It does not independently prove that a reported hazard is factually correct, and it is not a security certification.
 
 ---
 
-## Validated Evidence
+## Controlled Tabletop Evidence
 
-PingNet has completed both a validated six-node pilot baseline and a validated ten-node pre-pilot scale testbed.
+The results below describe specific controlled tabletop evidence sets. They are not public-road results, service-level guarantees, independently certified reliability, or proof of crash prevention.
 
-### Validated Six-Node Baseline
+### Six-Node Baseline
 
-The six-node baseline used Raspberry Pi nodes representing a mixed-role work-zone environment:
-
-- cabinet node
-- vehicle nodes
-- work-zone node
-- observer node
-- responder / supporting roles
-
-Three consecutive tagged pilot dry runs were completed:
+Three tagged six-node dry runs were completed on April 26, 2026:
 
 - `run-20260426-002`
 - `run-20260426-003`
 - `run-20260426-004`
 
-| Metric | Result |
+| Item | Reported result |
 |---|---:|
-| Nodes observed | 6/6 |
-| Delivery reliability | 100.00% |
-| Missing downstream receipts | 0 |
-| Signature validation success | 100.00% |
-| Invalid signatures accepted | 0 |
-| p95 latency | 36-299 ms |
-| Validation status | PASS |
+| Expected nodes observed | 6/6 |
+| Range of reported per-run p95 latency values | 36-299 ms |
+| Setting | Controlled tabletop |
 
-### Validated Ten-Node Pre-Pilot Testbed
+This evidence set is also the source of the six-node demonstration video. It is separate from the ten-node measurements below.
 
-The ten-node testbed extends the same evidence discipline to a larger mixed-role environment before field deployment.
+### Ten-Node Baseline
 
-Three consecutive tagged ten-node dry runs were completed:
+Three tagged ten-node dry runs were completed on June 7, 2026:
 
 - `run-10node-20260607-190405`
 - `run-10node-20260607-192316`
 - `run-10node-20260607-193016`
 
-| Metric | Result |
+All three passed PingNet's internal reporting criteria.
+
+| Item | Observed result |
 |---|---:|
-| Nodes observed | 10/10 |
-| Downstream receipts delivered | 54/54 |
-| Delivery reliability | 100.00% |
-| Missing downstream receipts | 0 |
-| Signature validation success | 100.00% |
-| Invalid signatures accepted | 0 |
-| p95 latency | 30-43 ms |
-| Validation status | PASS |
+| Expected nodes observed | 10/10 in each run |
+| Expected downstream receipts delivered | 54/54 across all three runs |
+| Missing expected downstream receipts | 0 |
+| Reported signature-validation success | 100% |
+| Per-run p95 latency | 43 ms, 33 ms, and 30 ms |
+| Range of per-run p95 latency values | 30-43 ms |
+| Setting | Controlled tabletop |
 
-### What This Proves
+The 30-43 ms figure is the range of the three per-run p95 values. It is not a pooled p95 and is not the range of all individual message delays. The 54/54 figure is observed delivery within this evidence set, not a universal reliability estimate.
 
-The current evidence demonstrates:
+### What These Controlled Runs Demonstrate
 
-- multi-node deployment and orchestration
-- deterministic scenario execution with run/scenario tagging
-- decentralized message propagation
-- cryptographic trust enforcement
+Implemented mechanisms include:
+
+- signed message generation and validation under the configured trust model
 - replay and duplicate suppression
-- full log collection and KPI generation
-- sponsor-ready evidence output
-- pre-pilot scale validation across ten nodes
+- bounded local relay behavior
+- mixed-role node orchestration
+- tagged scenarios, log collection, and KPI reporting
+- post-run export generation from selected evidence
 
-### Known Limitations
+Observed results in the cited evidence sets include:
 
-The ten-node result is a controlled pre-pilot testbed, not a public road deployment.
+- participation of the expected nodes
+- delivery of the expected ten-node downstream receipts
+- the reported per-run latency values listed above
+- production of structured logs, KPI summaries, and export artifacts
 
-Hop-depth evidence should continue to improve through topology-correlated validation. Field geometry should be verified during field-pilot planning before any agency-facing location claims are treated as measured field data.
+These runs do not establish:
 
----
+- public-road or long-duration reliability
+- a measured improvement in driver or worker awareness
+- crash reduction or another safety outcome
+- comprehensive resistance to attack
+- independent certification or formal standards conformance
+- verified physical hop-depth reliability without topology correlation
+- operational integration or automatic failover with existing vehicle, roadside, or agency systems
 
-## CWZ/WZDx-Aligned Export Layer
-
-PingNet now includes an interoperability layer that maps validated pilot logs into WorkZoneFeed-style and DeviceFeed-style GeoJSON artifacts.
-
-This layer is intended to complement agency CWZ/WZDx workflows by adding:
-
-- local authenticated safety propagation
-- validated field or pre-field evidence
-- structured KPI summaries
-- scenario-tagged export artifacts
-- a clear separation between the local real-time safety path and backhaul reporting path
-
-PingNet is **not** claiming CWZ certification, WZDx certification, or formal conformance in this public overview. The export layer is described as CWZ/WZDx-aligned because it is designed to support review and integration discussions without overstating certification status.
+The combined ten-node report recorded zero invalid signatures dropped in these three runs. That observation is not presented as a headline security result because the evidence set does not establish a meaningful invalid-signature challenge population.
 
 ---
 
-## KPI Evidence Model
+## CWZ/WZDx-Aligned Export and Integration Direction
 
-PingNet is being developed as an evidence-generating pilot system.
+PingNet includes a CWZ/WZDx-aligned export layer that maps validated pilot logs into WorkZoneFeed-style and DeviceFeed-style GeoJSON artifacts. These post-run artifacts support review and integration discussions. They are separate from the local real-time communications path.
 
-The primary KPI is:
+### Available capability
 
-> **Reliability**
+- post-run WorkZoneFeed-style and DeviceFeed-style GeoJSON artifacts derived from selected test evidence
+- structured run, scenario, node-role, and KPI context in the associated PingNet evidence workflow
 
-Supporting KPIs include:
+### Under consideration with an evaluation partner
 
-- latency
-- delivery rate
-- replay rejection
-- signature validation
-- node uptime
-- time-to-awareness improvement
-- CWZ/WZDx-aligned export readiness
+- interfaces that fit the partner's existing mapping and operational workflows
+- the intended users, data handoffs, and review steps for the selected use case
+- whether and how selected evidence should be translated into partner-facing artifacts
 
-### Evidence Flow
+### Not claimed
+
+- formal CWZ or WZDx conformance or certification
+- a public registry listing or live agency feed service
+- native OEM, C-V2X, DSRC, or SCMS interoperability
+- tested automatic failover with existing vehicle or roadside systems
+- universal compatibility with phones, drones, or micromobility devices
+
+Export geometry may be modeled unless a field location has been explicitly verified. PingNet-specific KPI evidence is kept distinct from native feed fields. The existence of an export artifact does not establish deployment-time data exchange with an agency.
+
+---
+
+## Evaluation Measures
+
+A proposed evaluation would define measures and thresholds with the participating operator before execution. Candidate technical measures include:
+
+- expected-message receipt delivery under defined conditions
+- receipt latency and per-run latency summaries
+- continuity and node availability over an agreed test period
+- signature-validation outcomes under the configured trust model
+- replay and duplicate-handling behavior
+- completeness of logs and after-action evidence
+- fit with the operator's existing workflow and interface needs
+
+Node-level communications metrics are not proxies for time to human awareness, driver response, crash reduction, or other safety outcomes. Those outcomes require appropriately designed human or operational studies.
 
 ```text
-Pilot Scenario
-    -> Node Logs
+Agreed Scenario
+    -> Participating Node Logs
     -> Collection Manifest
     -> KPI Aggregation
-    -> CWZ/WZDx-Aligned Export Artifacts
-    -> Sponsor-Facing Evidence Package
+    -> Reviewed Export Artifacts
+    -> Evidence-Based After-Action Report
 ```
-
-The system supports structured run IDs, scenario tags, node roles, post-run KPI summaries, and evidence packaging.
 
 ---
 
 ## Current Development Focus
 
-PingNet is currently focused on pilot validation, not broad feature expansion.
+Near-term work supports evaluation readiness rather than broad feature expansion:
 
-Near-term priorities:
+1. define the operator problem, intended recipients, and existing workflow
+2. seek bounded independent technical review of the proposed evaluation
+3. define scenario conditions, measures, success criteria, and stop criteria
+4. prepare site, safety, data, and authorization requirements
+5. improve deployment hygiene and evidence-package review
+6. scope partner-specific integration questions without claiming connectors that do not exist
 
-1. Advisor-guided field-pilot planning
-2. Long-duration test discipline
-3. Field geometry verification
-4. Topology-correlated hop evidence
-5. Runtime hardening and deployment hygiene
-6. Evidence-package refinement for DOT, city, and strategic investor review
-
-Rust remains a future production-hardening path, but it is not required before pilot evidence is generated.
+Python remains the current pilot runtime. Rust is a possible future implementation choice if measured requirements justify it. A Rust rewrite is not underway and is not a prerequisite for a feasibility evaluation.
 
 ---
 
-## Technical Direction
+## Evaluation Partner Fit
 
-The current pilot runtime is Python-based and has been validated for the pilot baseline and ten-node pre-pilot testbed.
+PingNet welcomes discussions with work-zone operators, public-works and fleet teams, state or local transportation agencies, and appropriate roadway contractors that want to assess one concrete problem.
 
-The production direction remains:
+Before an evaluation could proceed, the parties would need to agree on:
 
-- compact runtime
-- local-first safety propagation
-- strict message validation
-- bounded relay behavior
-- transport abstraction
-- robust deployment and observability discipline
-- eventual Rust hardening for performance-critical paths
+- the scenario and operating conditions
+- the intended recipients and the information they need
+- the existing workflow, mapping tools, and interface requirements
+- scope, funding, site authorization, and safety responsibilities
+- measurement methods, success criteria, and stop criteria
+- data handling and an evidence-based after-action report
 
-The current engineering principle is:
+A useful initial partner does not need to commit to a corridor deployment. The first discussion should establish whether a bounded feasibility evaluation is appropriate and what evidence would support a decision.
 
-> Pilot evidence first. Runtime hardening second.
+### Discuss a scoped work-zone evaluation
 
----
-
-## What This Repository Is
-
-This repository is a public technical overview of PingNet's pilot direction, system boundaries, and validation progress.
-
-It is intended for:
-
-- engineers evaluating the technical problem
-- pilot partners reviewing deployment assumptions
-- advisors reviewing the architecture
-- grant or funding stakeholders seeking technical context
-- strategic investors reviewing the evidence trajectory
-
----
-
-## What This Repository Is Not
-
-This repository is not the full production codebase.
-
-It does not include:
-
-- private implementation details
-- security-sensitive keys
-- deployment credentials
-- proprietary pilot materials
-- full source code for the active runtime
-- certification filings or formal conformance claims
-
-It also should not be read as a claim that PingNet is production-ready, CWZ certified, WZDx certified, SCMS-ready, or a replacement for C-V2X/DSRC.
-
----
-
-## Pilot Partner Fit
-
-PingNet is currently seeking conversations with:
-
-- city managers
-- public works departments
-- traffic operations teams
-- state and local transportation agencies
-- work-zone safety stakeholders
-- municipal fleet operators
-- contractors involved in roadway work-zone operations
-
-A strong first pilot partner would have:
-
-- one candidate arterial corridor
-- several signalized intersections
-- a repeatable or simulated work-zone condition
-- a small group of participating agency vehicles
-- willingness to review a sponsor-ready KPI report
+- [Email Jonathan Garrett Jr.](mailto:jonathan.garrettjr@pingnet.net?subject=PingNet%20work-zone%20evaluation)
+- [Schedule a 30-minute conversation](https://calendly.com/jonathan-garrettjr-pingnet)
 
 ---
 
 ## Roadmap
 
-### Completed
+### Demonstrated
 
-- Six-node Raspberry Pi baseline
-- Ten-node Raspberry Pi pre-pilot testbed
-- Mixed-role node configuration
-- Ed25519 message signing
-- replay protection
-- duplicate suppression
-- UDP-based local message propagation
-- run/scenario tagging
-- log collection
-- KPI report generation
-- three consecutive validated six-node dry runs
-- three consecutive validated ten-node dry runs
-- combined ten-node KPI evidence output
-- CWZ/WZDx-aligned GeoJSON export artifacts
+- controlled six-node and ten-node tabletop operation
+- mixed-role participating-node configuration
+- signed message validation under the configured trust model
+- replay and duplicate suppression mechanisms
+- local message propagation
+- run and scenario tagging
+- log collection and KPI summaries
+- three consecutive six-node and three consecutive ten-node dry runs
+- combined ten-node evidence output
+- CWZ/WZDx-aligned post-run GeoJSON export artifacts
 
-### In Progress
+### Current preparation
 
-- advisor-guided field pilot design
-- long-duration test planning
-- stronger topology and hop-depth validation
-- field geometry verification
-- runtime hardening and deployment hygiene
-- pilot partner outreach
-- city and DOT pilot discussions
+- define one operator problem and its intended recipients
+- document existing workflow and interface needs
+- prepare a bounded independent technical-review scope
+- draft an evaluation plan, evidence plan, and authorization checklist
+- conduct operator and partner-fit discussions
 
-### Next
+### Proposed evaluation, subject to agreement
 
-- 20-30 node corridor pilot
-- cabinet sidecar + vehicle node deployment
-- active or simulated work-zone scenario
-- sponsor-ready after-action report
-- grant and pilot funding applications
+- agree on scope and funding
+- obtain site authorization and assign safety responsibilities
+- define scenario conditions, measurement methods, success criteria, and stop criteria
+- evaluate receipt delivery, latency, continuity, and integration needs under those conditions
+- produce a reviewed after-action report
+
+### Conditional later work
+
+- longer-duration and varied-layout testing
+- independently correlated topology and hop evidence
+- verified field geometry
+- additional runtime hardening based on measured needs
+- possible expansion toward an authorized 20-30-node corridor evaluation
+
+The corridor concept is an aspiration. It is not presented as scheduled, funded, or authorized, and it depends on evidence, partner readiness, resources, and approval.
+
+---
+
+## Technical Direction
+
+The current prototype runtime is Python-based. Current engineering priorities are reliable test execution, local-first communications, explicit validation boundaries, bounded relay behavior, transport abstraction, deployment hygiene, observability, and reviewable evidence.
+
+Future implementation choices will be driven by measured evaluation needs. They are not prerequisites for defining the first scoped evaluation.
+
+---
+
+## Research Context
+
+The [PingNet stakeholder research brief](https://pingnet.net/assets/documents/PingNet-Research-Brief.pdf) documents an earlier qualitative discovery phase. It is historical research, not current product validation or the current evaluation roadmap. Its earlier cellular and application-led pilot concept should not be read as the present local-first work-zone plan.
+
+Charts, comparative efficacy statements, quotations, and organizational references in that brief require source, method, denominator, and permission review before they are reused as current claims. Additional alerts do not replace required traffic-control measures.
+
+---
+
+## What This Repository Is
+
+This repository is a public technical overview of PingNet's work-zone prototype, controlled evidence, system boundaries, and proposed evaluation path. It is intended for operators, engineers, reviewers, funding stakeholders, and prospective evaluation partners who need a clear account of what exists, what was observed, and what remains to be tested.
+
+## What This Repository Is Not
+
+This repository is not the production codebase and does not disclose private implementation details, keys, credentials, proprietary evaluation materials, unpublished algorithms, or legal strategy.
+
+It should not be read as a claim that PingNet is production-ready, independently certified, CWZ or WZDx certified, SCMS-ready, interoperable with C-V2X or DSRC, or a replacement for required work-zone traffic-control practices.
 
 ---
 
 ## Longer-Term Direction
 
-PingNet's broader architecture may later support additional connected safety use cases such as:
+The broader architecture may later be evaluated for responder awareness, fleet safety, infrastructure participation, standardized vehicle communications, cellular bridging, or other connected-safety uses. These are possible future directions, not current product commitments.
 
-- responder awareness
-- fleet safety
-- infrastructure participation
-- C-V2X integration
-- cellular bridge support
-- constrained drone or UAS participation
+The present sequence is:
 
-These are not the current pilot wedge.
-
-The current execution path remains:
-
-> work-zone hazard propagation -> measurable corridor safety evidence -> pilot partner validation -> scaled deployment.
+> controlled tabletop evidence -> scoped operator problem -> agreed feasibility evaluation -> evidence-based decision on later work
 
 ---
 
 ## Contact
 
 Jonathan Garrett Jr.  
-Founder, PingNet LLC  
+Founder, PingNet LLC
 
-Email: jonathan.garrettjr@pingnet.net  
-Website: https://www.pingnet.net  
-GitHub: https://github.com/jonathangarrettjr/pingnet-overview  
-LinkedIn: https://www.linkedin.com/in/jonathan-garrett-jr  
+- Email: [jonathan.garrettjr@pingnet.net](mailto:jonathan.garrettjr@pingnet.net)
+- Phone: [+1 (202) 656-5639](tel:+12026565639)
+- Website: [pingnet.net](https://pingnet.net/)
+- Schedule: [30-minute conversation](https://calendly.com/jonathan-garrettjr-pingnet)
+- LinkedIn: [linkedin.com/in/jonathan-garrett-jr](https://www.linkedin.com/in/jonathan-garrett-jr/)
 
 ---
 
 ## Status Summary
 
-PingNet has transitioned from prototype to validated pre-pilot scale evidence system.
+As of September 28, 2026, PingNet has a working local-first prototype and controlled six-node and ten-node tabletop evidence. It is preparing for a narrowly scoped, customer-funded work-zone feasibility evaluation and seeking bounded independent technical review.
 
-The current priority is not expanding features for their own sake.
-
-The current priority is proving repeatable, measurable safety value through advisor-guided field validation and corridor pilot conversations.
+No paid evaluation, customer contract, authorized field site, completed independent review, or public-road deployment is announced here. Later field and corridor work remains conditional on an agreed problem, evidence plan, funding, partner readiness, resources, site authorization, and safety responsibilities.
